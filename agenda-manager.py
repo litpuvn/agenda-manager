@@ -1,6 +1,5 @@
 import heapq
 import itertools
-import ast
 import re
 
 class AgendaManager:
@@ -13,22 +12,27 @@ class AgendaManager:
 
     def BuildQueue(self, rules):
         # self.heap_rules = []
+        no_heap_rules = []
         for rule in rules:
             entry = self._create_entry(rule)
-            self.heap_rules.append(entry)
+            no_heap_rules.append(entry)
 
-        self.Heapify()
+        heap_rules = self.Heapify(no_heap_rules)
 
-    def Heapify(self):
-        heapq.heapify(self.heap_rules)
+        print("Built queue: ", self.heap_rules)
+
+    def Heapify(self, rules):
+        heapq.heapify(rules)
+
+        return rules
 
     def Insert(self, new_rule):
         entry = self._create_entry(new_rule)
 
         heapq.heappush(self.heap_rules, entry)
 
-    def Delete(self):
-        print("delete a rule")
+    def Delete(self, rule):
+        print("delete a rule", rule)
 
     def ExtractMax(self):
         if len(self.heap_rules) < 1:
@@ -36,8 +40,9 @@ class AgendaManager:
 
         max = heapq.nlargest(1, self.heap_rules)
         max = max[0]
-
-        return (max[2], max[0])
+        found = [max[2], max[0]]
+        print("Extract max: ", found)
+        return found
 
     def Run(self, rules):
         self.BuildQueue(rules)
@@ -45,6 +50,9 @@ class AgendaManager:
 
         max_item = self.ExtractMax()
         print(max_item)
+
+    def HasItem(self):
+        return len(self.heap_rules) > 0
 
     def Print(self):
         print(self.heap_rules)
@@ -82,6 +90,7 @@ class AgendaManager:
     #     raise KeyError('pop from an empty priority queue')
 
 my_rules = [('arule', 12), ('brule', 21), ('crule', 70), ('drule', 25), ('erule', 10)]
+
 
 # return an array of rules
 def convert_line_to_tuple(line):
@@ -123,22 +132,30 @@ def convert_line_to_tuple(line):
     return my_tuples
 
 
-
-
 agenda_manager = AgendaManager()
 
+counter = 0
 with open('input.txt') as f:
     for line in f:
         line = line.rstrip()
         rule_priority_list = convert_line_to_tuple(line)
+
         if isinstance(rule_priority_list, bool):
             print("Ignore an incorrect rule line: ", line)
             continue
 
+        counter += 1
+        print("Cycle", counter)
+
         agenda_manager.BuildQueue(rule_priority_list)
-        agenda_manager.Print()
+        rule_largest_priority = agenda_manager.ExtractMax()
+        agenda_manager.Delete(rule_largest_priority)
 
+while agenda_manager.HasItem():
+    counter += 1
+    print("Cycle", counter)
 
+    # remove largest priority item
+    rule_largest_priority = agenda_manager.ExtractMax()
+    agenda_manager.Delete(rule_largest_priority)
 
-
-# AgendaManager().Run(my_rules)
