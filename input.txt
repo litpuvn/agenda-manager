@@ -1,0 +1,3 @@
+(arule, 12), (brule, 21), (crule, 70), (drule, 25), (erule, 10)
+(frule, 3)
+(grule, 20), (srule, 100)
