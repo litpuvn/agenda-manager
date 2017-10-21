@@ -94,7 +94,7 @@ def convert_line_to_tuple(line):
     if len(tmp) % 2 != 0:
         return False
 
-    my_tuple = []
+    my_tuples = []
     entry = []
     for index, item in enumerate(tmp):
         item = item.strip()
@@ -106,7 +106,7 @@ def convert_line_to_tuple(line):
 
         if index % 2 == 0:
             if len(entry) > 0:
-                my_tuple.append(entry)
+                my_tuples.append(entry)
                 entry = []
         if index % 2 == 1 and not item.isnumeric():
             return False
@@ -115,9 +115,12 @@ def convert_line_to_tuple(line):
 
     # append last item
     if len(entry) > 0:
-        my_tuple.append(entry)
+        my_tuples.append(entry)
 
-    return my_tuple
+    if len(my_tuples) < 1:
+        return False
+
+    return my_tuples
 
 
 
@@ -127,12 +130,12 @@ agenda_manager = AgendaManager()
 with open('input.txt') as f:
     for line in f:
         line = line.rstrip()
-        tuple_list = convert_line_to_tuple(line)
-        if isinstance(tuple_list, bool):
+        rule_priority_list = convert_line_to_tuple(line)
+        if isinstance(rule_priority_list, bool):
             print("Ignore an incorrect rule line: ", line)
             continue
 
-        agenda_manager.BuildQueue(tuple_list)
+        agenda_manager.BuildQueue(rule_priority_list)
         agenda_manager.Print()
 
 
