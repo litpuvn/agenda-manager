@@ -3,28 +3,54 @@ import itertools
 import re
 
 class AgendaManager:
-    # pq = []  # list of entries arranged in a heap
-    # entry_finder = {}  # mapping of tasks to entries
-    # REMOVED = '<removed-task>'  # placeholder for a removed task
 
-    counter = itertools.count()  # unique sequence count
-    heap_rules = []
+    def _left(self, parent_index):
+        return 2*parent_index + 1
+
+    def _right(self, parent_index):
+        return 2*parent_index + 2
+
+    def _parent(self, current_index):
+        return (current_index - 1) // 2
+
+    def _rule_value(self, rules, index):
+        rule = rules[index]
+        return rule[1]
 
     def BuildQueue(self, rules):
         # self.heap_rules = []
-        no_heap_rules = []
-        for rule in rules:
-            entry = self._create_entry(rule)
-            no_heap_rules.append(entry)
+        if len(rules) < 1:
+            return rules
 
-        heap_rules = self.Heapify(no_heap_rules)
+        parent_of_last_leaf_index = self._parent(len(rules) - 1)
 
-        print("Built queue: ", self.heap_rules)
+        # include index zero
+        for i in range(parent_of_last_leaf_index, -1, -1):
+            print("heapify for", i)
+            self.Heapify(rules, i)
 
-    def Heapify(self, rules):
-        heapq.heapify(rules)
+        print("BuildQueue:", rules)
 
-        return rules
+    def Heapify(self, rules, index):
+
+        left_index = self._left(index)
+        right_index = self._right(index)
+
+        heap_size = len(rules)
+
+        if left_index < heap_size and self._rule_value(rules, left_index) > self._rule_value(rules, index):
+            largest = left_index
+        else:
+            largest = index
+
+        if right_index < heap_size and self._rule_value(rules, right_index) > self._rule_value(rules, largest):
+            largest = right_index
+
+        if largest != index:
+            tmp = rules[index]
+            rules[index] = rules[largest]
+            rules[largest] = tmp
+            self.Heapify(rules, largest)
 
     def Insert(self, new_rule):
         entry = self._create_entry(new_rule)
@@ -44,53 +70,8 @@ class AgendaManager:
         print("Extract max: ", found)
         return found
 
-    def Run(self, rules):
-        self.BuildQueue(rules)
-        print(self.heap_rules)
-
-        max_item = self.ExtractMax()
-        print(max_item)
-
     def HasItem(self):
         return len(self.heap_rules) > 0
-
-    def Print(self):
-        print(self.heap_rules)
-
-    def _create_entry(self, rule):
-        count = next(self.counter)
-        priority = rule[1]
-        rule = rule[0]
-
-        return [priority, count, rule]
-
-    #
-    #
-    # def _add_task(self, task, priority=0):
-    #     'Add a new task or update the priority of an existing task'
-    #     if task in self.entry_finder:
-    #         self._remove_task(task)
-    #     count = next(self.counter)
-    #     entry = [priority, count, task]
-    #     self.entry_finder[task] = entry
-    #     heapq.heappush(self.heap_rules, entry)
-    #
-    # def _remove_task(self, task):
-    #     'Mark an existing task as REMOVED.  Raise KeyError if not found.'
-    #     entry = self.entry_finder.pop(task)
-    #     entry[-1] = self.REMOVED
-    #
-    # def _pop_task(self):
-    #     'Remove and return the lowest priority task. Raise KeyError if empty.'
-    #     while self.heap_rules:
-    #         priority, count, task = heapq.heappop(self.heap_rules)
-    #         if task is not self.REMOVED:
-    #             del self.entry_finder[task]
-    #             return task
-    #     raise KeyError('pop from an empty priority queue')
-
-my_rules = [('arule', 12), ('brule', 21), ('crule', 70), ('drule', 25), ('erule', 10)]
-
 
 # return an array of rules
 def convert_line_to_tuple(line):
@@ -146,8 +127,9 @@ with open('input.txt') as f:
 
         counter += 1
         print("Cycle", counter)
-
+        print("Current unsorted list:", rule_priority_list)
         agenda_manager.BuildQueue(rule_priority_list)
+
         rule_largest_priority = agenda_manager.ExtractMax()
         agenda_manager.Delete(rule_largest_priority)
 
