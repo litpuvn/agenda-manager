@@ -13,9 +13,20 @@ class AgendaManager:
     def _parent(self, current_index):
         return (current_index - 1) // 2
 
-    def _rule_value(self, rules, index):
+    def _heap_rule_value(self, rules, index):
         rule = rules[index]
+
+        return self._rule_value(rule)
+
+    def _rule_value(self, rule):
+
         return rule[1]
+
+    def _get_blank_rule(self):
+        return ['rule', -1]
+
+    def _get_root_index(self):
+        return 0
 
     def BuildQueue(self, rules):
         # self.heap_rules = []
@@ -38,12 +49,12 @@ class AgendaManager:
 
         heap_size = len(rules)
 
-        if left_index < heap_size and self._rule_value(rules, left_index) > self._rule_value(rules, index):
+        if left_index < heap_size and self._heap_rule_value(rules, left_index) > self._heap_rule_value(rules, index):
             largest = left_index
         else:
             largest = index
 
-        if right_index < heap_size and self._rule_value(rules, right_index) > self._rule_value(rules, largest):
+        if right_index < heap_size and self._heap_rule_value(rules, right_index) > self._heap_rule_value(rules, largest):
             largest = right_index
 
         if largest != index:
@@ -52,26 +63,37 @@ class AgendaManager:
             rules[largest] = tmp
             self.Heapify(rules, largest)
 
-    def Insert(self, new_rule):
-        entry = self._create_entry(new_rule)
+    def Insert(self, heap_rules, new_rule):
+        heap_rules.append(self._get_blank_rule())
+        hea_size = len(heap_rules)
+        i = hea_size
+        parent_of_i = self._parent(i)
 
-        heapq.heappush(self.heap_rules, entry)
+        root_index = self._get_root_index()
+        inserted_priority = self._rule_value(new_rule)
+
+        while i > root_index and self._heap_rule_value(heap_rules, parent_of_i) < inserted_priority:
+            heap_rules[i] = heap_rules[parent_of_i]
+            i = parent_of_i
+            parent_of_i = self._parent(i)
+
+        heap_rules[i] = new_rule
 
     def Delete(self, rule):
         print("delete a rule", rule)
 
-    def ExtractMax(self):
-        if len(self.heap_rules) < 1:
+
+    def ExtractMax(self, heap_rules):
+        heap_size = len(heap_rules)
+        if heap_size < 1:
             return KeyError("Heap queue is empty")
 
-        max = heapq.nlargest(1, self.heap_rules)
-        max = max[0]
-        found = [max[2], max[0]]
-        print("Extract max: ", found)
-        return found
+        max_value = heap_rules[0]
+        heap_rules[0] = heap_rules[heap_size-1]
+        del heap_rules[-1]
+        self.Heapify(heap_rules, 0)
 
-    def HasItem(self):
-        return len(self.heap_rules) > 0
+        return max_value
 
 # return an array of rules
 def convert_line_to_tuple(line):
