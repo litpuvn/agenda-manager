@@ -88,10 +88,11 @@ class AgendaManager:
         if heap_size < 1:
             return KeyError("Heap queue is empty")
 
-        max_value = heap_rules[0]
-        heap_rules[0] = heap_rules[heap_size-1]
+        root_index = self._get_root_index()
+        max_value = heap_rules[root_index]
+        heap_rules[root_index] = heap_rules[heap_size-1]
         del heap_rules[-1]
-        self.Heapify(heap_rules, 0)
+        self.Heapify(heap_rules, root_index)
 
         return max_value
 
