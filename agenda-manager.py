@@ -1,6 +1,7 @@
 import heapq
 import itertools
 import re
+import timeit
 
 class AgendaManager:
 
@@ -174,28 +175,34 @@ def convert_line_to_tuple(line):
 agenda_manager = AgendaManager()
 
 counter = 0
-with open('input.txt') as f:
-    for line in f:
-        line = line.rstrip()
-        rule_priority_list = convert_line_to_tuple(line)
+try:
 
-        if isinstance(rule_priority_list, bool):
-            print("Ignore an incorrect rule line: ", line)
-            continue
+    with open('input.txt') as f:
+        for line in f:
+            line = line.rstrip()
+            rule_priority_list = convert_line_to_tuple(line)
 
+            if isinstance(rule_priority_list, bool):
+                print("Ignore an incorrect rule line: ", line)
+                continue
+
+            counter += 1
+            print("Cycle", counter)
+            # print("Current unsorted list:", rule_priority_list)
+
+            agenda_manager.BuildQueue(rule_priority_list)
+            agenda_manager.ExtractMax()
+            # agenda_manager.Delete(rule_largest_priority)
+
+    while agenda_manager.HasItem():
         counter += 1
         print("Cycle", counter)
-        # print("Current unsorted list:", rule_priority_list)
 
-        agenda_manager.BuildQueue(rule_priority_list)
-        agenda_manager.ExtractMax()
-        # agenda_manager.Delete(rule_largest_priority)
+        # remove largest priority item
+        rule_largest_priority = agenda_manager.ExtractMax()
+        agenda_manager.Delete(rule_largest_priority)
 
-while agenda_manager.HasItem():
-    counter += 1
-    print("Cycle", counter)
-
-    # remove largest priority item
-    rule_largest_priority = agenda_manager.ExtractMax()
-    agenda_manager.Delete(rule_largest_priority)
-
+except FileNotFoundError:
+    print("The file does not exist. Please verify your input file")
+except:
+    print("Something went wrong. please review your program")
