@@ -188,8 +188,10 @@ end_agenda_execution = False
 counter = 0
 try:
     with open(rule_file) as f:
+        # read line by line to save memory. If there are more than 30 valid lines, the loop with exit
         for line in f:
             line = line.rstrip()
+            # create input record from a line
             rule_priority_list = convert_line_to_tuple(line)
 
             if isinstance(rule_priority_list, bool):
@@ -216,7 +218,7 @@ try:
             if counter >= 30:
                 end_agenda_execution = True
                 break
-
+    # keep extracting and deleting max rule if the agenda has not reached its 30th cycle.
     while agenda_manager.HasItem() and not end_agenda_execution:
         counter += 1
         print("****** Cycle", counter, "******")
