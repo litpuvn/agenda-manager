@@ -106,12 +106,26 @@ class AgendaManager:
         heap_rules[i] = new_rule
 
     def Delete(self, rule):
-        a = 1
-        # print("delete a rule", rule)
+        print("***** delete max of heap *****", self.my_priority_queue)
+        heap_rules = self.my_priority_queue
+        heap_size = len(heap_rules)
+        if heap_size < 1:
+            return KeyError("Heap queue is empty")
+
+        max_rule = self.ExtractMax()
+        if self._rule_value(rule) != self._rule_value(max_rule):
+            print("Rule", rule, "is not max rule to be deleted")
+            return
+
+        root_index = self._get_root_index()
+        heap_rules[root_index] = heap_rules[heap_size-1]
+        del heap_rules[-1]
+        self.Heapify(heap_rules, root_index)
+
+        print("End delete max:", self.my_priority_queue)
 
 
     def ExtractMax(self):
-        print("***** Extract max of heap *****", self.my_priority_queue)
         heap_rules = self.my_priority_queue
         heap_size = len(heap_rules)
         if heap_size < 1:
@@ -119,11 +133,6 @@ class AgendaManager:
 
         root_index = self._get_root_index()
         max_value = heap_rules[root_index]
-        heap_rules[root_index] = heap_rules[heap_size-1]
-        del heap_rules[-1]
-        self.Heapify(heap_rules, root_index)
-
-        print("End extract max:", self.my_priority_queue)
 
         return max_value
 
@@ -191,8 +200,8 @@ try:
             # print("Current unsorted list:", rule_priority_list)
 
             agenda_manager.BuildQueue(rule_priority_list)
-            agenda_manager.ExtractMax()
-            # agenda_manager.Delete(rule_largest_priority)
+            max_element = agenda_manager.ExtractMax()
+            agenda_manager.Delete(max_element)
 
     while agenda_manager.HasItem():
         counter += 1
