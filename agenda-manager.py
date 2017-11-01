@@ -181,6 +181,8 @@ rule_file = argvs[1]
 if len(argvs) > 2:
     log_file = argvs[2]
 
+start_time = timeit.default_timer()
+
 agenda_manager = AgendaManager()
 
 counter = 0
@@ -225,3 +227,7 @@ except IOError:
     print("The file does not exist. Please verify your input file")
 except:
     print("Something went wrong. please review your program")
+
+end_time = timeit.default_timer()
+
+print("Problem size:", counter, "Execution time:", (1000*(end_time - start_time)),"ms")
