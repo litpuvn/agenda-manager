@@ -130,6 +130,9 @@ class AgendaManager:
     def GetQueue(self):
         return self.my_priority_queue
 
+    def QueueLength(self):
+        return len(self.my_priority_queue)
+
 # return an array of rules
 def convert_line_to_tuple(line):
     if len(line) < 1:
@@ -174,12 +177,9 @@ def convert_line_to_tuple(line):
 
 argvs = sys.argv
 if(len(argvs) < 2):
-    print("The program accepts only one argument which is a rule file.")
-    exit(1)
-
-rule_file = argvs[1]
-if len(argvs) > 2:
-    log_file = argvs[2]
+    rule_file = "input.txt"
+else:
+    rule_file = argvs[1]
 
 start_time = timeit.default_timer()
 
@@ -238,4 +238,4 @@ except:
 
 end_time = timeit.default_timer()
 
-print("Problem size:", counter, "Execution time:", (1000*(end_time - start_time)),"ms")
+print("Problem size:", (counter + agenda_manager.QueueLength()), "Execution time:", (1000*(end_time - start_time)),"ms")
