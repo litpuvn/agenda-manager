@@ -2,6 +2,8 @@ import heapq
 import itertools
 import re
 import timeit
+import sys
+
 
 class AgendaManager:
 
@@ -47,27 +49,27 @@ class AgendaManager:
 
     def BuildQueue(self, rules):
 
-        print("***** BUILD QUEUE *****")
+        print("BUILD QUEUE")
         if len(rules) < 1:
             print("Nothing to build")
             return
 
-        print("Build queue: ", rules, ", existing queue is:", self.my_priority_queue)
+        print("Build queue: ", rules)
 
         self.my_priority_queue.extend(rules)
         last_leaf_index = len(self.my_priority_queue) - 1
         parent_of_last_leaf_index = self._parent(last_leaf_index)
 
         for i in range(parent_of_last_leaf_index, -1, -1):
-            print("heapify for", i)
+            # print("heapify for", i)
             self.Heapify(self.my_priority_queue, i)
 
-        print("Final Queue:", self.my_priority_queue)
+        print("Agenda after build queue:", self.my_priority_queue)
 
 
     def Heapify(self, rules, index):
 
-        print("Heapify at", index, rules)
+        # print("Heapify at", index, rules)
         left_index = self._left(index)
         right_index = self._right(index)
 
@@ -81,7 +83,7 @@ class AgendaManager:
         if right_index < heap_size and self._heap_rule_value(rules, right_index) > self._heap_rule_value(rules, largest):
             largest = right_index
 
-        print("Largest index is:", largest, "; heapify index:", index)
+        # print("Largest index is:", largest, "; heapify index:", index)
 
         if largest != index:
             tmp = rules[index]
@@ -106,7 +108,7 @@ class AgendaManager:
         heap_rules[i] = new_rule
 
     def Delete(self, rule):
-        print("***** delete max of heap *****", self.my_priority_queue)
+        # print("EXTRACT AND DELETE MAX", self.my_priority_queue)
         heap_rules = self.my_priority_queue
         heap_size = len(heap_rules)
         if heap_size < 1:
@@ -116,13 +118,12 @@ class AgendaManager:
         if self._rule_value(rule) != self._rule_value(max_rule):
             print("Rule", rule, "is not max rule to be deleted")
             return
-
         root_index = self._get_root_index()
         heap_rules[root_index] = heap_rules[heap_size-1]
         del heap_rules[-1]
         self.Heapify(heap_rules, root_index)
 
-        print("End delete max:", self.my_priority_queue)
+        print("Agenda after delete max:", self.my_priority_queue)
 
 
     def ExtractMax(self):
@@ -181,12 +182,20 @@ def convert_line_to_tuple(line):
     return my_tuples
 
 
+argvs = sys.argv
+if(len(argvs) < 2):
+    print("The program accepts only one argument which is a rule file.")
+    exit(1)
+
+rule_file = argvs[1]
+if len(argvs) > 2:
+    log_file = argvs[2]
+
 agenda_manager = AgendaManager()
 
 counter = 0
 try:
-
-    with open('input.txt') as f:
+    with open(rule_file) as f:
         for line in f:
             line = line.rstrip()
             rule_priority_list = convert_line_to_tuple(line)
@@ -196,22 +205,26 @@ try:
                 continue
 
             counter += 1
-            print("Cycle", counter)
+            print("****** Cycle", counter, "******")
             # print("Current unsorted list:", rule_priority_list)
 
             agenda_manager.BuildQueue(rule_priority_list)
             max_element = agenda_manager.ExtractMax()
+            print("Extract max:", max_element)
+
             agenda_manager.Delete(max_element)
 
     while agenda_manager.HasItem():
         counter += 1
-        print("Cycle", counter)
+        print("****** Cycle", counter, "******")
 
         # remove largest priority item
         rule_largest_priority = agenda_manager.ExtractMax()
+        print("Extract max:", rule_largest_priority)
         agenda_manager.Delete(rule_largest_priority)
 
-except FileNotFoundError:
+    print("***** Inference terminate after cycle", counter, " ***")
+except IOError:
     print("The file does not exist. Please verify your input file")
 except:
     print("Something went wrong. please review your program")
