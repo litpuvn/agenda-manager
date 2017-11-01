@@ -184,7 +184,7 @@ if len(argvs) > 2:
 start_time = timeit.default_timer()
 
 agenda_manager = AgendaManager()
-
+end_agenda_execution = False
 counter = 0
 try:
     with open(rule_file) as f:
@@ -213,7 +213,11 @@ try:
 
             agenda_manager.Delete(max_element)
 
-    while agenda_manager.HasItem():
+            if counter >= 30:
+                end_agenda_execution = True
+                break
+
+    while agenda_manager.HasItem() and not end_agenda_execution:
         counter += 1
         print("****** Cycle", counter, "******")
 
@@ -221,6 +225,10 @@ try:
         rule_largest_priority = agenda_manager.ExtractMax()
         print("Extract max:", rule_largest_priority)
         agenda_manager.Delete(rule_largest_priority)
+
+        if counter >= 30:
+            end_agenda_execution = True
+            break
 
     print("***** Inference terminate after cycle", counter, " ***")
 except IOError:
