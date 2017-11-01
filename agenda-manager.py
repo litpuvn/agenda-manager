@@ -33,20 +33,6 @@ class AgendaManager:
     def _get_root_index(self):
         return 0
 
-    # def _build_heap(self, rules):
-    #     # self.heap_rules = []
-    #     if len(rules) < 1:
-    #         return rules
-    #
-    #     parent_of_last_leaf_index = self._parent(len(rules) - 1)
-    #
-    #     # include index zero
-    #     for i in range(parent_of_last_leaf_index, -1, -1):
-    #         print("heapify for", i)
-    #         self.Heapify(rules, i)
-    #
-    #     print("BuildQueue:", rules)
-
     def BuildQueue(self, rules):
 
         print("BUILD QUEUE")
@@ -91,10 +77,11 @@ class AgendaManager:
             rules[largest] = tmp
             self.Heapify(rules, largest)
 
-    def Insert(self, heap_rules, new_rule):
+    def Insert(self, new_rule):
+        heap_rules = self.my_priority_queue
         heap_rules.append(self._get_blank_rule())
-        hea_size = len(heap_rules)
-        i = hea_size
+        heap_size = len(heap_rules)
+        i = heap_size - 1 # last element
         parent_of_i = self._parent(i)
 
         root_index = self._get_root_index()
@@ -139,6 +126,9 @@ class AgendaManager:
 
     def HasItem(self):
         return len(self.my_priority_queue) > 0
+
+    def GetQueue(self):
+        return self.my_priority_queue
 
 # return an array of rules
 def convert_line_to_tuple(line):
@@ -208,7 +198,14 @@ try:
             print("****** Cycle", counter, "******")
             # print("Current unsorted list:", rule_priority_list)
 
-            agenda_manager.BuildQueue(rule_priority_list)
+            if counter < 2:
+                agenda_manager.BuildQueue(rule_priority_list)
+            else:
+                print("Insert rules: ", rule_priority_list)
+                for r in rule_priority_list:
+                    agenda_manager.Insert(r)
+                print("Agenda After Insert rules: ", agenda_manager.GetQueue())
+
             max_element = agenda_manager.ExtractMax()
             print("Extract max:", max_element)
 
