@@ -69,6 +69,7 @@ class AgendaManager:
         if right_index < heap_size and self._heap_rule_value(rules, right_index) > self._heap_rule_value(rules, largest):
             largest = right_index
 
+
         # print("Largest index is:", largest, "; heapify index:", index)
 
         if largest != index:
@@ -76,6 +77,20 @@ class AgendaManager:
             rules[index] = rules[largest]
             rules[largest] = tmp
             self.Heapify(rules, largest)
+
+    def HeapSort(self):
+        sorted_list = []
+        heap_size = len(self.my_priority_queue)
+        for i in range(heap_size-1, 0, -1):
+            my_item = self.my_priority_queue[0]
+            sorted_list.append(self.my_priority_queue[0])
+            self.my_priority_queue[0] = self.my_priority_queue[i]
+            self.my_priority_queue.pop()
+            self.Heapify(self.my_priority_queue, 0)
+
+            print("Insert ", self._rule_value(my_item), "next-heap:", self.my_priority_queue)
+
+        print("Done")
 
     def Insert(self, new_rule):
         heap_rules = self.my_priority_queue
@@ -177,7 +192,7 @@ def convert_line_to_tuple(line):
 
 argvs = sys.argv
 if(len(argvs) < 2):
-    rule_file = "input.txt"
+    rule_file = "input-min-heap2.txt"
 else:
     rule_file = argvs[1]
 
@@ -204,6 +219,9 @@ try:
 
             if counter < 2:
                 agenda_manager.BuildQueue(rule_priority_list)
+
+                agenda_manager.HeapSort()
+
             else:
                 print("Insert rules: ", rule_priority_list)
                 for r in rule_priority_list:
